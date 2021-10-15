@@ -1,8 +1,8 @@
-package rgbmatrix
+package matrix
 
 /*
-#cgo CFLAGS: -std=c99 -I${SRCDIR}/vendor/rpi-rgb-led-matrix/include -DSHOW_REFRESH_RATE
-#cgo LDFLAGS: -lrgbmatrix -L${SRCDIR}/vendor/rpi-rgb-led-matrix/lib -lstdc++ -lm
+#cgo CFLAGS: -std=c99 -I${SRCDIR}/../../third_party/rpi-rgb-led-matrix/include -DSHOW_REFRESH_RATE
+#cgo LDFLAGS: -lrgbmatrix -L${SRCDIR}/../../third_party/rpi-rgb-led-matrix/lib -lstdc++ -lm
 #include <led-matrix-c.h>
 
 void led_matrix_swap(struct RGBLedMatrix *matrix, struct LedCanvas *offscreen_canvas,
@@ -39,11 +39,12 @@ void set_inverse_colors(struct RGBLedMatrixOptions *o, int inverse_colors) {
 import "C"
 import (
 	"fmt"
+	"go-rpi-rgb-led-matrix/tools"
 	"image/color"
 	"os"
 	"unsafe"
 
-	"github.com/mcuadros/go-rpi-rgb-led-matrix/emulator"
+	"go-rpi-rgb-led-matrix/internal/emulator"
 )
 
 // DefaultConfig default WS281x configuration
@@ -97,10 +98,13 @@ type HardwareConfig struct {
 
 	// Name of GPIO mapping used
 	HardwareMapping string
+
+	PixelMapping string
 }
 
 func (c *HardwareConfig) geometry() (width, height int) {
 	return c.Cols * c.ChainLength, c.Rows * c.Parallel
+	//return c.Cols, c.Rows
 }
 
 func (c *HardwareConfig) toC() *C.struct_RGBLedMatrixOptions {
@@ -114,6 +118,7 @@ func (c *HardwareConfig) toC() *C.struct_RGBLedMatrixOptions {
 	o.brightness = C.int(c.Brightness)
 	o.scan_mode = C.int(c.ScanMode)
 	o.hardware_mapping = C.CString(c.HardwareMapping)
+	o.pixel_mapper_config = C.CString(c.PixelMapping)
 
 	if c.ShowRefreshRate == true {
 		C.set_show_refresh_rate(o, C.int(1))
@@ -154,10 +159,10 @@ type RGBLedMatrix struct {
 	leds   []C.uint32_t
 }
 
-const MatrixEmulatorENV = "MATRIX_EMULATOR"
+const EmulatorENV = "MATRIX_EMULATOR"
 
 // NewRGBLedMatrix returns a new matrix using the given size and config
-func NewRGBLedMatrix(config *HardwareConfig) (c Matrix, err error) {
+func NewRGBLedMatrix(config *HardwareConfig) (c tools.Matrix, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			var ok bool
@@ -172,9 +177,16 @@ func NewRGBLedMatrix(config *HardwareConfig) (c Matrix, err error) {
 		return buildMatrixEmulator(config), nil
 	}
 
-	w, h := config.geometry()
 	m := C.led_matrix_create_from_options(config.toC(), nil, nil)
 	b := C.led_matrix_create_offscreen_canvas(m)
+
+	cW := C.int(0)
+	cH := C.int(0)
+
+	C.led_canvas_get_size(b, &cW, &cH)
+
+	w, h := int(cW), int(cH)
+
 	c = &RGBLedMatrix{
 		Config: config,
 		width:  w, height: h,
@@ -190,14 +202,14 @@ func NewRGBLedMatrix(config *HardwareConfig) (c Matrix, err error) {
 }
 
 func isMatrixEmulator() bool {
-	if os.Getenv(MatrixEmulatorENV) == "1" {
+	if os.Getenv(EmulatorENV) == "1" {
 		return true
 	}
 
 	return false
 }
 
-func buildMatrixEmulator(config *HardwareConfig) Matrix {
+func buildMatrixEmulator(config *HardwareConfig) tools.Matrix {
 	w, h := config.geometry()
 	return emulator.NewEmulator(w, h, emulator.DefaultPixelPitch, true)
 }
@@ -224,7 +236,7 @@ func (c *RGBLedMatrix) Apply(leds []color.Color) error {
 
 // Render update the display with the data from the LED buffer
 func (c *RGBLedMatrix) Render() error {
-	w, h := c.Config.geometry()
+	w, h := c.Geometry()
 
 	C.led_matrix_swap(
 		c.matrix,

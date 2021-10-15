@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"go-rpi-rgb-led-matrix/tools"
 	"os"
 	"time"
 
-	"github.com/mcuadros/go-rpi-rgb-led-matrix"
-	"github.com/mcuadros/go-rpi-rgb-led-matrix/rpc"
+	"go-rpi-rgb-led-matrix/pkg/rpc"
 )
 
 var (
@@ -17,10 +18,10 @@ func main() {
 	f, err := os.Open(*img)
 	fatal(err)
 
-	m, err := rpc.NewClient("tcp", "10.20.20.20:1234")
+	m, err := rpc.NewClient("tcp", "10.42.0.161:1234", 100*100)
 	fatal(err)
 
-	tk := rgbmatrix.NewToolKit(m)
+	tk := tools.NewToolKit(m)
 	close, err := tk.PlayGIF(f)
 	fatal(err)
 
@@ -34,6 +35,7 @@ func init() {
 
 func fatal(err error) {
 	if err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 }

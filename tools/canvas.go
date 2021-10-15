@@ -1,4 +1,4 @@
-package rgbmatrix
+package tools
 
 import (
 	"image"
@@ -62,7 +62,11 @@ func (c *Canvas) Clear() error {
 
 // Close clears the matrix and close the matrix
 func (c *Canvas) Close() error {
-	c.Clear()
+	err := c.Clear()
+	if err != nil {
+		return err
+	}
+
 	return c.m.Close()
 }
 

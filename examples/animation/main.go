@@ -2,12 +2,13 @@ package main
 
 import (
 	"flag"
+	"go-rpi-rgb-led-matrix/pkg/matrix"
+	"go-rpi-rgb-led-matrix/tools"
 	"image"
 	"image/color"
 	"time"
 
 	"github.com/fogleman/gg"
-	"github.com/mcuadros/go-rpi-rgb-led-matrix"
 )
 
 var (
@@ -20,10 +21,11 @@ var (
 	show_refresh             = flag.Bool("led-show-refresh", false, "Show refresh rate.")
 	inverse_colors           = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
 	disable_hardware_pulsing = flag.Bool("led-no-hardware-pulse", false, "Don't use hardware pin-pulse generation.")
+	pixelMapping             = flag.String("led-pixel-mapper", "U-mapper", "Pixel mapping from api")
 )
 
 func main() {
-	config := &rgbmatrix.DefaultConfig
+	config := &matrix.DefaultConfig
 	config.Rows = *rows
 	config.Cols = *cols
 	config.Parallel = *parallel
@@ -33,11 +35,12 @@ func main() {
 	config.ShowRefreshRate = *show_refresh
 	config.InverseColors = *inverse_colors
 	config.DisableHardwarePulsing = *disable_hardware_pulsing
+	config.PixelMapping = *pixelMapping
 
-	m, err := rgbmatrix.NewRGBLedMatrix(config)
+	m, err := matrix.NewRGBLedMatrix(config)
 	fatal(err)
 
-	tk := rgbmatrix.NewToolKit(m)
+	tk := tools.NewToolKit(m)
 	defer tk.Close()
 
 	tk.PlayAnimation(NewAnimation(image.Point{64, 32}))

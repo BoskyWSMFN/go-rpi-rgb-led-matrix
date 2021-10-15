@@ -1,4 +1,4 @@
-package rgbmatrix
+package tools
 
 import (
 	"image"

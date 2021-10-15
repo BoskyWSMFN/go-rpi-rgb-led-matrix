@@ -2,10 +2,9 @@ package rpc
 
 import (
 	"encoding/gob"
+	"go-rpi-rgb-led-matrix/tools"
 	"image/color"
 	"net/rpc"
-
-	"github.com/mcuadros/go-rpi-rgb-led-matrix"
 )
 
 func init() {
@@ -21,7 +20,7 @@ type Client struct {
 }
 
 // NewRGBLedMatrix returns a new matrix using the given size and config
-func NewClient(network, addr string) (rgbmatrix.Matrix, error) {
+func NewClient(network, addr string, size int) (tools.Matrix, error) {
 	client, err := rpc.DialHTTP(network, addr)
 	if err != nil {
 		return nil, err
@@ -31,14 +30,14 @@ func NewClient(network, addr string) (rgbmatrix.Matrix, error) {
 		network: network,
 		addr:    addr,
 		client:  client,
-		leds:    make([]color.Color, 2048),
+		leds:    make([]color.Color, size),
 	}, nil
 }
 
 // Geometry returns the width and the height of the matrix
 func (c *Client) Geometry() (width, height int) {
 	var reply *GeometryReply
-	err := c.client.Call("RPCMatrix.Geometry", &GeometryArgs{}, &reply)
+	err := c.client.Call("Matrix.Geometry", &GeometryArgs{}, &reply)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +49,7 @@ func (c *Client) Apply(leds []color.Color) error {
 	defer func() { c.leds = make([]color.Color, 2048) }()
 
 	var reply *ApplyReply
-	return c.client.Call("RPCMatrix.Apply", &ApplyArgs{Colors: leds}, &reply)
+	return c.client.Call("Matrix.Apply", &ApplyArgs{Colors: leds}, &reply)
 }
 
 // Render update the display with the data from the LED buffer
