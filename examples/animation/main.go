@@ -43,7 +43,7 @@ func main() {
 	tk := tools.NewToolKit(m)
 	defer tk.Close()
 
-	tk.PlayAnimation(NewAnimation(image.Point{64, 32}))
+	tk.PlayAnimation(NewAnimation(image.Point{X: 32, Y: 32}))
 }
 
 func init() {
@@ -66,7 +66,7 @@ type Animation struct {
 func NewAnimation(sz image.Point) *Animation {
 	return &Animation{
 		ctx:    gg.NewContext(sz.X, sz.Y),
-		dir:    image.Point{1, 1},
+		dir:    image.Point{X: 32, Y: 32},
 		stroke: 5,
 	}
 }
@@ -78,7 +78,7 @@ func (a *Animation) Next() (image.Image, <-chan time.Time, error) {
 	a.ctx.Clear()
 
 	a.ctx.DrawCircle(float64(a.position.X), float64(a.position.Y), float64(a.stroke))
-	a.ctx.SetColor(color.RGBA{255, 0, 0, 255})
+	a.ctx.SetColor(color.RGBA{R: 255, A: 255})
 	a.ctx.Fill()
 	return a.ctx.Image(), time.After(time.Millisecond * 50), nil
 }

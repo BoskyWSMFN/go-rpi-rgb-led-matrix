@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"go-rpi-rgb-led-matrix/pkg/matrix"
 	"go-rpi-rgb-led-matrix/tools"
 	"image/color"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -37,16 +39,18 @@ func main() {
 	m, err := matrix.NewRGBLedMatrix(config)
 	fatal(err)
 
-	c := tools.NewCanvas(m)
-	defer c.Close()
+	tk := tools.NewToolKit(m)
+	defer tk.Close()
 
-	bounds := c.Bounds()
-	for x := bounds.Min.X; x < bounds.Max.X; x++ {
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			fmt.Println("x", x, "y", y)
-			c.Set(x, y, color.RGBA{R: 255, G: 255, B: 255, A: 255})
-			c.Render()
-		}
+	tk.DrawString("Cтр 1\nCтр 2\nCтр 3\nCтр 4\nCтр 5\n", color.RGBA{R: 255, G: 255, B: 255, A: 255}, nil)
+
+	osSignal := make(chan os.Signal, 1)
+	signal.Notify(osSignal, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	// Main routine sleeps until signal is received or global context is done.
+	case <-osSignal:
+		return
 	}
 }
 

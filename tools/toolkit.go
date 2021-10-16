@@ -39,7 +39,7 @@ func (tk *ToolKit) PlayImage(i image.Image, delay time.Duration) error {
 		i = tk.Transform(i)
 	}
 
-	draw.Draw(tk.Canvas, tk.Canvas.Bounds(), i, image.ZP, draw.Over)
+	draw.Draw(tk.Canvas, tk.Canvas.Bounds(), i, image.Point{}, draw.Over)
 	return tk.Canvas.Render()
 }
 
@@ -82,7 +82,7 @@ func (tk *ToolKit) PlayImageUntil(i image.Image, notify <-chan time.Time) error 
 		i = tk.Transform(i)
 	}
 
-	draw.Draw(tk.Canvas, tk.Canvas.Bounds(), i, image.ZP, draw.Over)
+	draw.Draw(tk.Canvas, tk.Canvas.Bounds(), i, image.Point{}, draw.Over)
 	return tk.Canvas.Render()
 }
 
@@ -90,7 +90,7 @@ func (tk *ToolKit) PlayImageUntil(i image.Image, notify <-chan time.Time) error 
 // images should be equal to the len of delay. If loop is true the function
 // loops over images until a true is sent to the returned chan
 func (tk *ToolKit) PlayImages(images []image.Image, delay []time.Duration, loop int) chan bool {
-	quit := make(chan bool, 0)
+	quit := make(chan bool)
 
 	go func() {
 		l := len(images)
@@ -100,7 +100,10 @@ func (tk *ToolKit) PlayImages(images []image.Image, delay []time.Duration, loop 
 			case <-quit:
 				return
 			default:
-				tk.PlayImage(images[i], delay[i])
+				err := tk.PlayImage(images[i], delay[i])
+				if err != nil {
+					return
+				}
 			}
 
 			i++

@@ -36,7 +36,7 @@ void set_inverse_colors(struct RGBLedMatrixOptions *o, int inverse_colors) {
   o->inverse_colors = inverse_colors != 0 ? 1 : 0;
 }
 */
-import "C"
+import "C" //nolint: typecheck
 import (
 	"fmt"
 	"go-rpi-rgb-led-matrix/tools"
@@ -258,6 +258,13 @@ func (c *RGBLedMatrix) At(position int) color.Color {
 // Set set LED at position x,y to the provided 24-bit color value.
 func (c *RGBLedMatrix) Set(position int, color color.Color) {
 	c.leds[position] = C.uint32_t(colorToUint32(color))
+}
+
+// DrawCircle - requires rendering before it is called.
+func (c *RGBLedMatrix) DrawCircle(x, y, radius int, col color.Color) {
+	r, g, b, _ := col.RGBA()
+
+	C.draw_circle(c.buffer, C.int(x), C.int(y), C.int(radius), C.uint8_t(r), C.uint8_t(g), C.uint8_t(b))
 }
 
 // Close finalizes the ws281x interface

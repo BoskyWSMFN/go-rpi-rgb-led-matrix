@@ -87,6 +87,7 @@ func (e *Emulator) mainWindowLoop(s screen.Screen) {
 				continue
 			}
 
+			//nolint: errcheck
 			e.Apply(make([]color.Color, e.Width*e.Height))
 			e.wg.Done()
 			e.isReady = true
@@ -106,6 +107,7 @@ func (e *Emulator) drawContext(sz size.Event) {
 	// Fill matrix display rectangle with the gutter color.
 	e.w.Fill(e.matrixWithMarginsRect(), e.GutterColor, screen.Src)
 	// Set all LEDs to black.
+	//nolint: errcheck
 	e.Apply(make([]color.Color, e.Width*e.Height))
 }
 
@@ -181,6 +183,10 @@ func (e *Emulator) Apply(leds []color.Color) error {
 
 	e.w.Publish()
 	return nil
+}
+
+func (e *Emulator) DrawCircle(_, _, _ int, _ color.Color) {
+
 }
 
 func (e *Emulator) Render() error {
