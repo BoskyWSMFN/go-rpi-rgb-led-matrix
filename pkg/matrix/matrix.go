@@ -183,7 +183,7 @@ func NewRGBLedMatrix(config *HardwareConfig) (c tools.Matrix, err error) {
 	cW := C.int(0)
 	cH := C.int(0)
 
-	C.led_canvas_get_size(b, &cW, &cH)
+	C.led_canvas_get_size(b, (*C.int)(unsafe.Pointer(&cW)), (*C.int)(unsafe.Pointer(&cH)))
 
 	w, h := int(cW), int(cH)
 

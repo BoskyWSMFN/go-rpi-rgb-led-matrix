@@ -5,7 +5,6 @@ import (
 	"go-rpi-rgb-led-matrix/pkg/matrix"
 	"go-rpi-rgb-led-matrix/tools"
 	"image/color"
-	"math"
 	"os"
 	"os/signal"
 	"syscall"
@@ -46,7 +45,7 @@ func main() {
 	geomX, geomY := m.Geometry()
 	centerX := geomX / 2
 	centerY := geomY / 2
-	radius := int(math.Round(math.Min(float64(geomX), float64(geomY))))
+	radius := 15
 
 	tk.DrawCircle(centerX, centerY, radius, color.RGBA{R: 255, A: 255})
 
