@@ -267,6 +267,16 @@ func (c *RGBLedMatrix) DrawCircle(x, y, radius int, col color.Color) {
 	C.draw_circle(c.buffer, C.int(x), C.int(y), C.int(radius), C.uint8_t(r), C.uint8_t(g), C.uint8_t(b))
 }
 
+func (c *RGBLedMatrix) SetBrightness(b uint8) error {
+	if b > 100 || b < 0 {
+		return fmt.Errorf("must be percentage")
+	}
+
+	C.led_matrix_set_brightness(c.matrix, C.uint8_t(b))
+
+	return nil
+}
+
 // Close finalizes the ws281x interface
 func (c *RGBLedMatrix) Close() error {
 	C.led_matrix_delete(c.matrix)

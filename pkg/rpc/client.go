@@ -68,11 +68,15 @@ func (c *Client) At(position int) color.Color {
 }
 
 // Set set LED at position x,y to the provided 24-bit color value.
-func (m *Client) Set(position int, c color.Color) {
-	m.leds[position] = color.RGBAModel.Convert(c)
+func (c *Client) Set(position int, col color.Color) {
+	c.leds[position] = color.RGBAModel.Convert(col)
 }
 
 // Close finalizes the ws281x interface
 func (c *Client) Close() error {
 	return c.Apply(make([]color.Color, 2048))
+}
+
+func (c *Client) SetBrightness(b uint8) error {
+	return c.client.Call("Matrix.Geometry", &SetBrightnessArgs{B: b}, &SetBrightnessReply{})
 }

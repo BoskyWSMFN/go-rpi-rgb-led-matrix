@@ -77,6 +77,7 @@ type Matrix interface {
 	At(position int) color.Color
 	Set(position int, c color.Color)
 	Apply([]color.Color) error
+	SetBrightness(b uint8) error
 	Render() error
 	Close() error
 }

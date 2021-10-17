@@ -2,12 +2,15 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"github.com/enotofil/cyrfont"
 	"go-rpi-rgb-led-matrix/pkg/matrix"
 	"go-rpi-rgb-led-matrix/tools"
 	"image/color"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var (
@@ -42,7 +45,44 @@ func main() {
 	tk := tools.NewToolKit(m)
 	defer tk.Close()
 
-	tk.DrawString("Cтр 1\nCтр 2\nCтр 3\nCтр 4\nCтр 5\n", color.RGBA{R: 255, G: 255, B: 255, A: 255}, nil)
+	indent := 3
+
+	//tk.DrawString("Cтр 1\nCтр 2\nCтр 3\nCтр 4\nCтр 5\n",
+	//	indent,
+	//	color.RGBA{R: 255, G: 255, B: 255, A: 255},
+	//	nil)
+	//
+	//time.Sleep(time.Second * 10)
+	//
+	//tk.Canvas.Clear()
+
+	someValue := 111
+	for someValue >= 0 {
+		time.Sleep(time.Millisecond * 250)
+
+		someValue--
+		if someValue < 0 {
+			someValue = 0
+		}
+
+		switch {
+		case someValue < 10:
+			indent = 23
+		case someValue < 100:
+			indent = 14
+		}
+
+		newMessage := fmt.Sprintf("\n%d", someValue)
+
+		tk.DrawString(newMessage,
+			indent,
+			color.RGBA{R: 255, G: 255, B: 255, A: 255},
+			cyrfont.Scaled9x15(2))
+
+		if someValue == 0 {
+			break
+		}
+	}
 
 	osSignal := make(chan os.Signal, 1)
 	signal.Notify(osSignal, syscall.SIGINT, syscall.SIGTERM)

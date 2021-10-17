@@ -40,6 +40,13 @@ func (m *Matrix) Close(_ *CloseArgs, _ *CloseReply) error {
 	return m.m.Close()
 }
 
+type SetBrightnessArgs struct{ B uint8 }
+type SetBrightnessReply struct{}
+
+func (m *Matrix) SetBrightness(a *SetBrightnessArgs, _ *SetBrightnessReply) {
+	m.m.SetBrightness(a.B)
+}
+
 func Serve(m tools.Matrix) error {
 	err := rpc.Register(&Matrix{m})
 	if err != nil {

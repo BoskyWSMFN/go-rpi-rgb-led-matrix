@@ -170,7 +170,7 @@ func (e *Emulator) Geometry() (width, height int) {
 	return e.Width, e.Height
 }
 
-func (e *Emulator) Apply(leds []color.Color) error {
+func (e *Emulator) Apply(_ []color.Color) error {
 	defer func() { e.leds = make([]color.Color, e.Height*e.Width) }()
 
 	var c color.Color
@@ -206,5 +206,9 @@ func (e *Emulator) Set(position int, c color.Color) {
 }
 
 func (e *Emulator) Close() error {
+	return nil
+}
+
+func (e *Emulator) SetBrightness(_ uint8) error {
 	return nil
 }
