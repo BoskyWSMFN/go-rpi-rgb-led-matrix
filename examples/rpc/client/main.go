@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/canvas"
 	"os"
 	"time"
 
@@ -21,7 +21,7 @@ func main() {
 	m, err := rpc.NewClient("tcp", "10.42.0.161:1234", 100*100)
 	fatal(err)
 
-	tk := tools.NewToolKit(m)
+	tk := canvas.NewToolKit(m)
 	close, err := tk.PlayGIF(f)
 	fatal(err)
 

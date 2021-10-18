@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/canvas"
 	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/matrix"
-	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"github.com/enotofil/cyrfont"
 	"image/color"
 	"os"
@@ -42,7 +42,7 @@ func main() {
 	m, err := matrix.NewRGBLedMatrix(config)
 	fatal(err)
 
-	tk := tools.NewToolKit(m)
+	tk := canvas.NewToolKit(m)
 	defer tk.Close()
 
 	indent := 3

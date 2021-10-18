@@ -1,4 +1,4 @@
-package tools
+package canvas
 
 import (
 	"golang.org/x/image/font"

@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"encoding/gob"
-	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/canvas"
 	"image/color"
 	"net/rpc"
 )
@@ -20,7 +20,7 @@ type Client struct {
 }
 
 // NewRGBLedMatrix returns a new matrix using the given size and config
-func NewClient(network, addr string, size int) (tools.Matrix, error) {
+func NewClient(network, addr string, size int) (canvas.Matrix, error) {
 	client, err := rpc.DialHTTP(network, addr)
 	if err != nil {
 		return nil, err

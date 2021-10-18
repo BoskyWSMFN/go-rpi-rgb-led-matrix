@@ -2,17 +2,17 @@ package rpc
 
 import (
 	"fmt"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/canvas"
 	"image/color"
 	"net"
 	"net/http"
 	"net/rpc"
 
-	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"github.com/pkg/errors"
 )
 
 type Matrix struct {
-	m tools.Matrix
+	m canvas.Matrix
 }
 
 type GeometryArgs struct{}
@@ -47,7 +47,7 @@ func (m *Matrix) SetBrightness(a *SetBrightnessArgs, _ *SetBrightnessReply) {
 	m.m.SetBrightness(a.B)
 }
 
-func Serve(m tools.Matrix) error {
+func Serve(m canvas.Matrix) error {
 	err := rpc.Register(&Matrix{m})
 	if err != nil {
 		return errors.Wrap(err, "register error:")

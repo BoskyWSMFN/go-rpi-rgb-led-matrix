@@ -39,7 +39,7 @@ void set_inverse_colors(struct RGBLedMatrixOptions *o, int inverse_colors) {
 import "C" //nolint: typecheck
 import (
 	"fmt"
-	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/canvas"
 	"image/color"
 	"os"
 	"unsafe"
@@ -162,7 +162,7 @@ type RGBLedMatrix struct {
 const EmulatorENV = "MATRIX_EMULATOR"
 
 // NewRGBLedMatrix returns a new matrix using the given size and config
-func NewRGBLedMatrix(config *HardwareConfig) (c tools.Matrix, err error) {
+func NewRGBLedMatrix(config *HardwareConfig) (c canvas.Matrix, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			var ok bool
@@ -209,7 +209,7 @@ func isMatrixEmulator() bool {
 	return false
 }
 
-func buildMatrixEmulator(config *HardwareConfig) tools.Matrix {
+func buildMatrixEmulator(config *HardwareConfig) canvas.Matrix {
 	w, h := config.geometry()
 	return emulator.NewEmulator(w, h, emulator.DefaultPixelPitch, true)
 }

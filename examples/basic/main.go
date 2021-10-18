@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/canvas"
 	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/matrix"
-	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"image/color"
 )
 
@@ -37,7 +37,7 @@ func main() {
 	m, err := matrix.NewRGBLedMatrix(config)
 	fatal(err)
 
-	c := tools.NewCanvas(m)
+	c := canvas.NewCanvas(m)
 	defer c.Close()
 
 	bounds := c.Bounds()
