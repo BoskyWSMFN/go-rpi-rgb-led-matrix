@@ -1,4 +1,4 @@
-module go-rpi-rgb-led-matrix
+module github.com/BoskyWSMFN/go-rpi-rgb-led-matrix
 
 go 1.17
 
