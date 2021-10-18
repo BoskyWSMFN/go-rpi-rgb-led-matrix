@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-rpi-rgb-led-matrix/tools"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"os"
 	"time"
 
-	"go-rpi-rgb-led-matrix/pkg/rpc"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/rpc"
 )
 
 var (

@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"go-rpi-rgb-led-matrix/pkg/matrix"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/matrix"
 
-	"go-rpi-rgb-led-matrix/pkg/rpc"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/rpc"
 )
 
 var (

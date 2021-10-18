@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/pkg/matrix"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"github.com/enotofil/cyrfont"
-	"go-rpi-rgb-led-matrix/pkg/matrix"
-	"go-rpi-rgb-led-matrix/tools"
 	"image/color"
 	"os"
 	"os/signal"

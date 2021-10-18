@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"encoding/gob"
-	"go-rpi-rgb-led-matrix/tools"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"image/color"
 	"net/rpc"
 )

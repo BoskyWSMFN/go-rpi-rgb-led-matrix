@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/rpc"
 
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"github.com/pkg/errors"
-	"go-rpi-rgb-led-matrix/tools"
 )
 
 type Matrix struct {

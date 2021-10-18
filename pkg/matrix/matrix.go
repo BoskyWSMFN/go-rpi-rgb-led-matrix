@@ -44,7 +44,7 @@ import (
 	"os"
 	"unsafe"
 
-	"go-rpi-rgb-led-matrix/internal/emulator"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/internal/emulator"
 )
 
 // DefaultConfig default WS281x configuration
