@@ -39,7 +39,7 @@ void set_inverse_colors(struct RGBLedMatrixOptions *o, int inverse_colors) {
 import "C" //nolint: typecheck
 import (
 	"fmt"
-	"go-rpi-rgb-led-matrix/tools"
+	"github.com/BoskyWSMFN/go-rpi-rgb-led-matrix/tools"
 	"image/color"
 	"os"
 	"unsafe"
