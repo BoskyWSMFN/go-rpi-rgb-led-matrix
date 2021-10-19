@@ -4,6 +4,7 @@ package matrix
 #cgo CFLAGS: -std=c99 -I${SRCDIR}/../../third_party/rpi-rgb-led-matrix/include -DSHOW_REFRESH_RATE
 #cgo LDFLAGS: -lrgbmatrix -L${SRCDIR}/../../third_party/rpi-rgb-led-matrix/lib -lstdc++ -lm
 #include <led-matrix-c.h>
+#include <stdio.h>
 
 void led_matrix_swap(struct RGBLedMatrix *matrix, struct LedCanvas *offscreen_canvas,
                      int width, int height, const uint32_t pixels[]) {
@@ -34,6 +35,14 @@ void set_disable_hardware_pulsing(struct RGBLedMatrixOptions *o, int disable_har
 
 void set_inverse_colors(struct RGBLedMatrixOptions *o, int inverse_colors) {
   o->inverse_colors = inverse_colors != 0 ? 1 : 0;
+}
+
+void set_daemon(struct RGBLedRuntimeOptions *rt, int daemon) {
+  rt->daemon = daemon != 0 ? 1 : 0;
+}
+
+void set_drop_privileges(struct RGBLedRuntimeOptions *rt, int drop) {
+  rt->drop_privileges = drop != 0 ? 1 : 0;
 }
 */
 import "C" //nolint: typecheck
@@ -100,6 +109,11 @@ type HardwareConfig struct {
 	HardwareMapping string
 
 	PixelMapping string
+
+	SlowdownGPIO   int
+	Daemon         bool
+	DropPrivileges bool
+	DoGPIOInit     bool
 }
 
 func (c *HardwareConfig) geometry() (width, height int) {
@@ -107,7 +121,7 @@ func (c *HardwareConfig) geometry() (width, height int) {
 	//return c.Cols, c.Rows
 }
 
-func (c *HardwareConfig) toC() *C.struct_RGBLedMatrixOptions {
+func (c *HardwareConfig) toC() (*C.struct_RGBLedMatrixOptions, *C.struct_RGBLedRuntimeOptions) {
 	o := &C.struct_RGBLedMatrixOptions{}
 	o.rows = C.int(c.Rows)
 	o.cols = C.int(c.Cols)
@@ -120,25 +134,43 @@ func (c *HardwareConfig) toC() *C.struct_RGBLedMatrixOptions {
 	o.hardware_mapping = C.CString(c.HardwareMapping)
 	o.pixel_mapper_config = C.CString(c.PixelMapping)
 
-	if c.ShowRefreshRate == true {
+	if c.ShowRefreshRate {
 		C.set_show_refresh_rate(o, C.int(1))
 	} else {
 		C.set_show_refresh_rate(o, C.int(0))
 	}
 
-	if c.DisableHardwarePulsing == true {
+	if c.DisableHardwarePulsing {
 		C.set_disable_hardware_pulsing(o, C.int(1))
 	} else {
 		C.set_disable_hardware_pulsing(o, C.int(0))
 	}
 
-	if c.InverseColors == true {
+	if c.InverseColors {
 		C.set_inverse_colors(o, C.int(1))
 	} else {
 		C.set_inverse_colors(o, C.int(0))
 	}
 
-	return o
+	rt := &C.struct_RGBLedRuntimeOptions{}
+	rt.gpio_slowdown = C.int(c.SlowdownGPIO)
+	rt.do_gpio_init = C.bool(c.DoGPIOInit)
+
+	if c.Daemon {
+		C.set_daemon(rt, C.int(1))
+	} else {
+		C.set_daemon(rt, C.int(0))
+	}
+
+	if c.DropPrivileges {
+		C.set_drop_privileges(rt, C.int(1))
+	} else {
+		C.set_drop_privileges(rt, C.int(0))
+	}
+
+	fmt.Println(o, rt)
+
+	return o, rt
 }
 
 type ScanMode int8
@@ -177,7 +209,7 @@ func NewRGBLedMatrix(config *HardwareConfig) (c canvas.Matrix, err error) {
 		return buildMatrixEmulator(config), nil
 	}
 
-	m := C.led_matrix_create_from_options(config.toC(), nil, nil)
+	m := C.led_matrix_create_from_options_and_rt_options(config.toC())
 	b := C.led_matrix_create_offscreen_canvas(m)
 
 	cW := C.int(0)
