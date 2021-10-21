@@ -65,7 +65,8 @@ c-compile:
 	git add $(GO_MATRIX_DIR)/*
 
 go-examples:
-	CC=$(ARMGCC) CXX=$(ARMGPP) GOOS=$(GO_OS) GOARCH=$(ARMTARGET) CGO_ENABLED=$(C_GO) go build -o $(BIN_DIR)/basic_$(ARMTARGET) -ldflags $(GO_LDFLAGS) $(GO_EXAMPLES_DIR)/basic/main.go
+	CC=$(ARMGCC) CXX=$(ARMGPP) GOOS=$(GO_OS) GOARCH=$(ARMTARGET) CGO_ENABLED=$(C_GO) \
+	go build -o $(BIN_DIR)/basic_$(ARMTARGET) -ldflags $(GO_LDFLAGS) $(GO_EXAMPLES_DIR)/basic/main.go
 
 clean:
 	rm -f $(BIN_DIR)/*

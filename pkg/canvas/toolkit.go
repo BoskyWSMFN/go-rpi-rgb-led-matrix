@@ -124,19 +124,19 @@ func (tk *ToolKit) PlayImages(images []image.Image, delay []time.Duration, loop 
 // PlayGIF reads and draw a gif file from r. It use the contained images and
 // delays and loops over it, until a true is sent to the returned chan
 func (tk *ToolKit) PlayGIF(r io.Reader) (chan bool, error) {
-	gif, err := gif.DecodeAll(r)
+	gifPic, err := gif.DecodeAll(r)
 	if err != nil {
 		return nil, err
 	}
 
-	delay := make([]time.Duration, len(gif.Delay))
-	images := make([]image.Image, len(gif.Image))
-	for i, image := range gif.Image {
-		images[i] = image
-		delay[i] = time.Millisecond * time.Duration(gif.Delay[i]) * 10
+	delay := make([]time.Duration, len(gifPic.Delay))
+	images := make([]image.Image, len(gifPic.Image))
+	for i, im := range gifPic.Image {
+		images[i] = im
+		delay[i] = time.Millisecond * time.Duration(gifPic.Delay[i]) * 10
 	}
 
-	return tk.PlayImages(images, delay, gif.LoopCount), nil
+	return tk.PlayImages(images, delay, gifPic.LoopCount), nil
 }
 
 // Close close the toolkit and the inner canvas

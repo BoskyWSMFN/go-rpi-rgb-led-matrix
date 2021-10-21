@@ -44,7 +44,9 @@ type SetBrightnessArgs struct{ B uint8 }
 type SetBrightnessReply struct{}
 
 func (m *Matrix) SetBrightness(a *SetBrightnessArgs, _ *SetBrightnessReply) {
-	m.m.SetBrightness(a.B)
+	if err := m.m.SetBrightness(a.B); err != nil {
+		return // TODO logger!
+	}
 }
 
 func Serve(m canvas.Matrix) error {

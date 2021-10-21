@@ -11,7 +11,7 @@ import (
 type Canvas struct {
 	w, h   int
 	m      Matrix
-	closed bool //nolint: structcheck, unused
+	closed bool
 }
 
 // NewCanvas returns a new Canvas using the given width and height and creates
@@ -68,7 +68,14 @@ func (c *Canvas) Close() error {
 		return err
 	}
 
+	c.closed = true
+
 	return c.m.Close()
+}
+
+// IsClosed - home someone will need it.
+func (c *Canvas) IsClosed() bool {
+	return c.closed
 }
 
 // Matrix is an interface that represent any RGB matrix, very useful for testing

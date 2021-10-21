@@ -15,7 +15,7 @@ import (
 // DrawString - simple way, requires delimiter "\n" for a new line.
 func (tk *ToolKit) DrawString(message string, indent int, col color.Color, face *basicfont.Face) error {
 	if face == nil {
-		face = cyrfont.Face9x15
+		face = cyrfont.Scaled9x15(1)
 	}
 
 	face.Advance = face.Advance + 3

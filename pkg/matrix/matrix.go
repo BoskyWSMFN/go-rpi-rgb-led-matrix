@@ -1,5 +1,7 @@
 package matrix
 
+// TODO refactor following C code
+
 /*
 
 #cgo CFLAGS: -std=c99 -I${SRCDIR}/include -DSHOW_REFRESH_RATE
@@ -137,19 +139,19 @@ func (c *HardwareConfig) toC() (*C.struct_RGBLedMatrixOptions, *C.struct_RGBLedR
 	o.hardware_mapping = C.CString(c.HardwareMapping)
 	o.pixel_mapper_config = C.CString(c.PixelMapping)
 
-	if c.ShowRefreshRate {
+	if c.ShowRefreshRate { // TODO also refactor. Change to bools.
 		C.set_show_refresh_rate(o, C.int(1))
 	} else {
 		C.set_show_refresh_rate(o, C.int(0))
 	}
 
-	if c.DisableHardwarePulsing {
+	if c.DisableHardwarePulsing { // TODO same here
 		C.set_disable_hardware_pulsing(o, C.int(1))
 	} else {
 		C.set_disable_hardware_pulsing(o, C.int(0))
 	}
 
-	if c.InverseColors {
+	if c.InverseColors { // TODO same here
 		C.set_inverse_colors(o, C.int(1))
 	} else {
 		C.set_inverse_colors(o, C.int(0))
@@ -170,8 +172,6 @@ func (c *HardwareConfig) toC() (*C.struct_RGBLedMatrixOptions, *C.struct_RGBLedR
 	} else {
 		C.set_drop_privileges(rt, C.int(0))
 	}
-
-	fmt.Println(o, rt)
 
 	return o, rt
 }
@@ -200,8 +200,7 @@ const EmulatorENV = "MATRIX_EMULATOR"
 func NewRGBLedMatrix(config *HardwareConfig) (c canvas.Matrix, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			var ok bool
-			err, ok = r.(error)
+			_, ok := r.(error)
 			if !ok {
 				err = fmt.Errorf("error creating matrix: %v", r)
 			}
@@ -212,11 +211,10 @@ func NewRGBLedMatrix(config *HardwareConfig) (c canvas.Matrix, err error) {
 		return buildMatrixEmulator(config), nil
 	}
 
-	m := C.led_matrix_create_from_options_and_rt_options(config.toC())
-	b := C.led_matrix_create_offscreen_canvas(m)
+	m := C.led_matrix_create_from_options_and_rt_options(config.toC()) // TODO C exceptions handling
+	b := C.led_matrix_create_offscreen_canvas(m)                       // TODO same here
 
-	cW := C.int(0)
-	cH := C.int(0)
+	cW, cH := C.int(0), C.int(0)
 
 	C.led_canvas_get_size(b, (*C.int)(unsafe.Pointer(&cW)), (*C.int)(unsafe.Pointer(&cH)))
 
@@ -237,22 +235,12 @@ func NewRGBLedMatrix(config *HardwareConfig) (c canvas.Matrix, err error) {
 }
 
 func isMatrixEmulator() bool {
-	if os.Getenv(EmulatorENV) == "1" {
-		return true
-	}
-
-	return false
+	return os.Getenv(EmulatorENV) == "1"
 }
 
 func buildMatrixEmulator(config *HardwareConfig) canvas.Matrix {
 	w, h := config.geometry()
 	return emulator.NewEmulator(w, h, emulator.DefaultPixelPitch, true)
-}
-
-// Initialize initialize library, must be called once before other functions are
-// called.
-func (c *RGBLedMatrix) Initialize() error {
-	return nil
 }
 
 // Geometry returns the width and the height of the matrix
@@ -302,9 +290,10 @@ func (c *RGBLedMatrix) DrawCircle(x, y, radius int, col color.Color) {
 	C.draw_circle(c.buffer, C.int(x), C.int(y), C.int(radius), C.uint8_t(r), C.uint8_t(g), C.uint8_t(b))
 }
 
+// SetBrightness - sets brightness in real time. Issue with network activity still remains.
 func (c *RGBLedMatrix) SetBrightness(b uint8) error {
-	if b > 100 || b < 0 {
-		return fmt.Errorf("must be percentage")
+	if b > 100 || b == 0 {
+		return fmt.Errorf("must be from 1 to 100")
 	}
 
 	C.led_matrix_set_brightness(c.matrix, C.uint8_t(b))
@@ -315,6 +304,7 @@ func (c *RGBLedMatrix) SetBrightness(b uint8) error {
 // Close finalizes the ws281x interface
 func (c *RGBLedMatrix) Close() error {
 	C.led_matrix_delete(c.matrix)
+
 	return nil
 }
 
@@ -325,14 +315,14 @@ func colorToUint32(c color.Color) uint32 {
 
 	// A color's RGBA method returns values in the range [0, 65535]
 	red, green, blue, _ := c.RGBA()
+
 	return (red>>8)<<16 | (green>>8)<<8 | blue>>8
 }
 
 func uint32ToColor(u C.uint32_t) color.Color {
 	return color.RGBA{
-		uint8(u>>16) & 255,
-		uint8(u>>8) & 255,
-		uint8(u>>0) & 255,
-		0,
+		R: uint8(u>>16) & 255,
+		G: uint8(u>>8) & 255,
+		B: uint8(u>>0) & 255,
 	}
 }
