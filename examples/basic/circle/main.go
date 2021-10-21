@@ -16,11 +16,12 @@ var (
 	parallel               = flag.Int("led-parallel", 1, "number of daisy-chained panels")
 	chain                  = flag.Int("led-chain", 2, "number of displays daisy-chained")
 	brightness             = flag.Int("brightness", 100, "brightness (0-100)")
-	hardwareMapping        = flag.String("led-gpio-mapping", "regular", "Name of GPIO mapping used.")
+	hardwareMapping        = flag.String("led-gpio-mapping", "adafruit-hat-pwm", "Name of GPIO mapping used.")
 	showRefresh            = flag.Bool("led-show-refresh", false, "Show refresh rate.")
 	inverseColors          = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
 	disableHardwarePulsing = flag.Bool("led-no-hardware-pulse", false, "Don't use hardware pin-pulse generation.")
 	pixelMapping           = flag.String("led-pixel-mapper", "U-mapper", "Pixel mapping from api")
+	slowGPIO               = flag.Int("led-slowdown-gpio", 5, "GPIO slowdown for pwm rpi hats")
 )
 
 func main() {
@@ -35,6 +36,7 @@ func main() {
 	config.InverseColors = *inverseColors
 	config.DisableHardwarePulsing = *disableHardwarePulsing
 	config.PixelMapping = *pixelMapping
+	config.SlowdownGPIO = *slowGPIO
 
 	m, err := matrix.NewRGBLedMatrix(config)
 	fatal(err)
@@ -45,9 +47,9 @@ func main() {
 	geomX, geomY := m.Geometry()
 	centerX := geomX / 2
 	centerY := geomY / 2
-	radius := 15
+	radius := 30
 
-	tk.DrawCircle(centerX, centerY, radius, color.RGBA{R: 255, A: 255})
+	tk.DrawCircle(centerX, centerY, radius, color.RGBA{G: 255, A: 255})
 
 	osSignal := make(chan os.Signal, 1)
 	signal.Notify(osSignal, syscall.SIGINT, syscall.SIGTERM)
