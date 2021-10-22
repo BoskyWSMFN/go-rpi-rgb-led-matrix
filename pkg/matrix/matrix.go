@@ -113,6 +113,7 @@ type HardwareConfig struct {
 	// Name of GPIO mapping used
 	HardwareMapping string
 
+	Multiplexing int
 	PixelMapping string
 
 	SlowdownGPIO   int
@@ -138,6 +139,7 @@ func (c *HardwareConfig) toC() (*C.struct_RGBLedMatrixOptions, *C.struct_RGBLedR
 	o.scan_mode = C.int(c.ScanMode)
 	o.hardware_mapping = C.CString(c.HardwareMapping)
 	o.pixel_mapper_config = C.CString(c.PixelMapping)
+	o.multiplexing = C.int(c.Multiplexing)
 
 	if c.ShowRefreshRate { // TODO also refactor. Change to bools.
 		C.set_show_refresh_rate(o, C.int(1))
@@ -173,7 +175,8 @@ func (c *HardwareConfig) toC() (*C.struct_RGBLedMatrixOptions, *C.struct_RGBLedR
 		C.set_drop_privileges(rt, C.int(0))
 	}
 
-	return o, rt
+	return (*C.struct_RGBLedMatrixOptions)(unsafe.Pointer(o)),
+		(*C.struct_RGBLedRuntimeOptions)(unsafe.Pointer(rt))
 }
 
 type ScanMode int8
