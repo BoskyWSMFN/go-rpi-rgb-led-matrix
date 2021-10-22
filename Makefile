@@ -1,8 +1,8 @@
 # We assume to use amd64 arch to crosscompile
 
 #some make env
-ARMGCC=arm-linux-gnueabi-gcc
-ARMGPP=arm-linux-gnueabi-g++
+ARMGCC=arm-linux-gnueabihf-gcc
+ARMGPP=arm-linux-gnueabihf-g++
 ARM64GCC=aarch64-linux-gnu-gcc
 ARM64GPP=aarch64-linux-gnu-g++
 
