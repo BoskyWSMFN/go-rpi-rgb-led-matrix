@@ -300,6 +300,7 @@ func (c *RGBLedMatrix) SetBrightness(b uint8) error {
 	}
 
 	C.led_matrix_set_brightness(c.matrix, C.uint8_t(b))
+	c.buffer = C.led_matrix_swap_on_vsync(c.matrix, c.buffer)
 
 	return nil
 }
