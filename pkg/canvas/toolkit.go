@@ -93,27 +93,32 @@ func (tk *ToolKit) PlayImages(images []image.Image, delay []time.Duration, loop 
 	quit := make(chan bool)
 
 	go func() {
-		l := len(images)
-		i := 0
+		counts := 0
+
 		for {
 			select {
 			case <-quit:
 				return
 			default:
-				err := tk.PlayImage(images[i], delay[i])
+			}
+
+			for i, im := range images {
+				err := tk.PlayImage(im, delay[i])
 				if err != nil {
-					return
+					break
+				}
+
+				if loop < 0 {
+					break
 				}
 			}
 
-			i++
-			if i >= l {
-				if loop == 0 {
-					i = 0
-					continue
-				}
+			if loop > 0 {
+				counts++
 
-				break
+				if counts > loop {
+					break
+				}
 			}
 		}
 	}()
